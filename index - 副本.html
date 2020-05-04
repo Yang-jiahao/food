@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        #app {
+            position: relative;
+            margin: 50px 200px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        
+        #app::after {
+            content: '';
+            display: block;
+            width: 33%;
+        }
+        
+        .foodStyle {
+            width: 280px;
+            height: 200px;
+        }
+        
+        .foodStyle img {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .foodName {
+            display: flex;
+            position: relative;
+            width: 100%;
+            /* height: 40px; */
+            line-height: 30px;
+            font-size: 24px;
+            padding: 10px 10px 20px 20px;
+        }
+        
+        .foodName span {
+            text-align: center;
+            display: inline-block;
+            background-color: rgb(91, 91, 243);
+            color: #fff;
+            font-size: 24px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .addCol {
+            position: absolute;
+            right: 10px;
+        }
+        
+        u {
+            padding: 5px;
+        }
+        
+        .store {
+            background-image: url("http://pic.90sjimg.com/design/00/57/93/24/58facdf0a69a0.png");
+            background-size: cover;
+            position: absolute;
+            /* left: 100px; */
+            right: 50px;
+            bottom: 50px;
+            width: 80px;
+            height: 80px;
+        }
+        
+        .store span {
+            /* margin-top: 10px; */
+            margin-left: 40px;
+            display: inline-block;
+            color: rgb(175, 41, 41);
+            border: 1px solid rgb(175, 41, 41);
+            min-width: 26px;
+            height: 26px;
+            text-align: center;
+            line-height: 26px;
+            border-radius: 50%;
+            background-color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <content-list :food="item" @change1="changelist" v-for="item in material" :key="item.id"></content-list>
+        <store :allnum="allnum"></store>
+
+    </div>
+    <script src="./vue.js"></script>
+    <script>
+        // $emit 监听谁的事件  就在谁的标签上写  注册事件  调用注册事件   
+        // 后面的方法是父组件的方法 这样父元素的方法就接收到了子元素触发事件时所携带的参数
+        Vue.component("content-list", {
+            template: `<div>
+                <div class="foodStyle">
+                    <img :src="food.src">
+                    </div>
+                <div class="foodName">
+                    {{food.name}} <add-col @change="changeNum" :choose="food.num"></add-col></div>
+                    
+                </div>`,
+            props: ["food"],
+            methods: {
+                changeNum(num) {
+                    this.$emit('change1', {...this.food,
+                        num
+                    })
+                }
+            },
+            components: {
+                "add-col": {
+                    template: `
+                    <div  class="addCol"><span @click="col" v-show="choose">-</span>
+                    <u>{{choose}}</u><span @click="add">+</span></div>`,
+                    props: ["choose"],
+                    methods: {
+                        add() {
+                            // this.choose +=
+                            this.$emit("change", this.choose + 1)
+                        },
+                        col() {
+                            this.$emit("change", this.choose - 1)
+
+                        }
+                    }
+                }
+            }
+        });
+        Vue.component('store', {
+            template: `<div class='store'>
+               <span>{{allnum}}</span>
+            </div>`,
+            props: ["allnum"]
+        })
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                material: [{
+                    id: 1,
+                    name: "大闸蟹",
+                    src: "https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3043108085,1765534538&fm=26&gp=0.jpg",
+                    num: 0,
+                }, {
+                    id: 2,
+                    name: "烤肉",
+                    src: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1582557907355&di=6a6a821cdb3a583e97d2d56574e75fbc&imgtype=0&src=http%3A%2F%2Finews.gtimg.com%2Fnewsapp_match%2F0%2F11290659785%2F0.jpg",
+                    num: 0
+                }, {
+                    id: 3,
+                    name: "火锅",
+                    src: "https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=343428030,2499861073&fm=26&gp=0.jpg",
+                    num: 0
+                }, {
+                    id: 4,
+                    name: "清晨套餐",
+                    src: "https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1230145573,523685873&fm=26&gp=0.jpg",
+                    num: 0
+                }, {
+                    id: 5,
+                    name: "肯德基",
+                    src: "https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1675217357,2922904225&fm=26&gp=0.jpg",
+                    num: 0
+                }]
+            },
+            methods: {
+                changelist(res) {
+                    // console.log(res);
+                    // this.material = [...this.material, res]
+                    let index = this.material.findIndex(item => item.id === res.id)
+                    this.material.splice(index, 1, res)
+                }
+            },
+            computed: {
+                allnum() {
+                    return this.material.reduce(function(last, now) {
+                        return last + now.num
+                    }, 0)
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
